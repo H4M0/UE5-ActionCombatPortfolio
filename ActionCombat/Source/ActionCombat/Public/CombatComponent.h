@@ -39,4 +39,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 };

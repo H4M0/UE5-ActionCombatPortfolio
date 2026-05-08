@@ -59,15 +59,11 @@ void UCombatComponent::StartAttack()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("StartAttack Called"));
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &UCombatComponent::OnAttackMontageEnded);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackMontage);
 
-	GetWorld()->GetTimerManager().SetTimer(
-		AttackTimerHandle,
-		this,
-		&UCombatComponent::EndAttack,
-		MontageDuration,
-		false
-	);
+	UE_LOG(LogTemp, Warning, TEXT("StartAttack Called"));
 }
 
 void UCombatComponent::EndAttack()
@@ -94,5 +90,17 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UCombatComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage != AttackMontage)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Attack Montage Ended. Interrupted: %s"), bInterrupted ? TEXT("true") : TEXT("false"));
+
+	EndAttack();
 }
 
