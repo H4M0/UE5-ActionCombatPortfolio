@@ -3,6 +3,10 @@
 
 #include "CombatComponent.h"
 
+#include "GameFramework/Character.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
+
 // Debugging purposes
 #include "TimerManager.h"
 
@@ -24,7 +28,36 @@ void UCombatComponent::StartAttack()
 		return;
 	}
 
+	if (!AttackMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AttackMontage is not assigned"));
+		return;
+	}
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner is not a Character"));
+		return;
+	}
+
+	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AnimInstance is invalid"));
+		return;
+	}
+
 	bIsAttacking = true;
+
+	const float MontageDuration = AnimInstance->Montage_Play(AttackMontage);
+
+	if (MontageDuration <= 0.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to play AttackMontage"));
+		EndAttack();
+		return;
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("StartAttack Called"));
 
@@ -32,7 +65,7 @@ void UCombatComponent::StartAttack()
 		AttackTimerHandle,
 		this,
 		&UCombatComponent::EndAttack,
-		1.0f,
+		MontageDuration,
 		false
 	);
 }

@@ -9,8 +9,8 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
-
-
+// Forward declaration to avoid including the entire header for UAnimMontage
+class UAnimMontage;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONCOMBAT_API UCombatComponent : public UActorComponent
@@ -36,4 +36,7 @@ private:
 	bool bIsAttacking = false;
 		
 	FTimerHandle AttackTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> AttackMontage;
 };
