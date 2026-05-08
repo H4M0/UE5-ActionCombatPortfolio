@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "ActionCombat.h"
 
+#include "CombatComponent.h"
+
 AActionCombatCharacter::AActionCombatCharacter()
 {
 	// Set size for collision capsule
@@ -48,6 +50,8 @@ AActionCombatCharacter::AActionCombatCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 }
 
 void AActionCombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -65,6 +69,9 @@ void AActionCombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AActionCombatCharacter::Look);
+
+		// Attacking
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AActionCombatCharacter::Attack);
 	}
 	else
 	{
@@ -130,4 +137,12 @@ void AActionCombatCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AActionCombatCharacter::Attack(const FInputActionValue& Value)
+{
+	if (CombatComponent)
+	{
+		CombatComponent->StartAttack();
+	}
 }

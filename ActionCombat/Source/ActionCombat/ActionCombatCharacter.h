@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "ActionCombatCharacter.generated.h"
 
+class UCombatComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
@@ -92,5 +93,14 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCombatComponent> CombatComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> AttackAction;
+
+	void Attack(const FInputActionValue& Value);
 };
 
