@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "ActionCombat",
+			"Path": "..\\Source\\ActionCombat.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "ActionCombatEditor",
+			"Path": "..\\Source\\ActionCombatEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
