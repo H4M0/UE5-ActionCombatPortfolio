@@ -3,6 +3,9 @@
 
 #include "CombatComponent.h"
 
+// Debugging purposes
+#include "TimerManager.h"
+
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
@@ -15,7 +18,30 @@ UCombatComponent::UCombatComponent()
 
 void UCombatComponent::StartAttack()
 {
+	if (bIsAttacking)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attack ignored: Already attacking"));
+		return;
+	}
+
+	bIsAttacking = true;
+
 	UE_LOG(LogTemp, Warning, TEXT("StartAttack Called"));
+
+	GetWorld()->GetTimerManager().SetTimer(
+		AttackTimerHandle,
+		this,
+		&UCombatComponent::EndAttack,
+		1.0f,
+		false
+	);
+}
+
+void UCombatComponent::EndAttack()
+{
+	bIsAttacking = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("EndAttack Called"));
 }
 
 
