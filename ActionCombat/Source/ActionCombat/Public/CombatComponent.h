@@ -22,7 +22,9 @@ public:
 	void StartAttack();
 	void EndAttack();
 
+	void BeginAttackTrace();
 	void PerformAttackTrace();
+	void EndAttackTrace();
 
 protected:
 	// Called when the game starts
@@ -34,6 +36,7 @@ public:
 
 private:
 	bool bIsAttacking = false;
+	bool bIsAttackTraceActive = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;

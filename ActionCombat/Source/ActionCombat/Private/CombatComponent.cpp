@@ -49,6 +49,7 @@ void UCombatComponent::StartAttack()
 	}
 
 	bIsAttacking = true;
+	bIsAttackTraceActive = false;
 
 	HitActorsThisAttack.Empty();
 
@@ -71,6 +72,7 @@ void UCombatComponent::StartAttack()
 void UCombatComponent::EndAttack()
 {
 	bIsAttacking = false;
+	bIsAttackTraceActive = false;
 	HitActorsThisAttack.Empty();
 
 	UE_LOG(LogTemp, Warning, TEXT("EndAttack Called"));
@@ -95,8 +97,26 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+void UCombatComponent::BeginAttackTrace()
+{
+	if (!bIsAttacking)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BeginAttackTrace ignored: Not attacking"));
+		return;
+	}
+
+	bIsAttackTraceActive = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("Attack Trace Window Begin"));
+}
+
 void UCombatComponent::PerformAttackTrace()
 {
+	if (!bIsAttacking || !bIsAttackTraceActive)
+	{
+		return;
+	}
+
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if (!OwnerCharacter)
 	{
@@ -172,6 +192,18 @@ void UCombatComponent::PerformAttackTrace()
 		UE_LOG(LogTemp, Warning, TEXT("Attack hit: %s"),
 			*HitActor->GetActorNameOrLabel());
 	}
+}
+
+void UCombatComponent::EndAttackTrace()
+{
+	if (!bIsAttackTraceActive)
+	{
+		return;
+	}
+
+	bIsAttackTraceActive = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("Attack Trace Window End"));
 }
 
 void UCombatComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
