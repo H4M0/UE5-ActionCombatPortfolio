@@ -3,12 +3,12 @@
 
 #include "CombatComponent.h"
 
+#include "StatComponent.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
-
-// Debugging purposes
-#include "TimerManager.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -64,6 +64,8 @@ void UCombatComponent::StartAttack()
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackMontage);
 
 	UE_LOG(LogTemp, Warning, TEXT("StartAttack Called"));
+
+	PerformAttackTrace();
 }
 
 void UCombatComponent::EndAttack()
@@ -90,6 +92,78 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UCombatComponent::PerformAttackTrace()
+{
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	const FVector Start = OwnerCharacter->GetActorLocation() + FVector(0.0f, 0.0f, 50.0f);
+	const FVector Forward = OwnerCharacter->GetActorForwardVector();
+	const FVector End = Start + Forward * AttackRange;
+
+	TArray<FHitResult> HitResults;
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(OwnerCharacter);
+
+	const FCollisionShape CollisionShape = FCollisionShape::MakeSphere(AttackRadius);
+
+	const bool bHit = World->SweepMultiByObjectType(
+		HitResults,
+		Start,
+		End,
+		FQuat::Identity,
+		ObjectQueryParams,
+		CollisionShape,
+		QueryParams
+	);
+
+	DrawDebugLine(World, Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+	DrawDebugSphere(World, End, AttackRadius, 16, FColor::Red, false, 1.0f);
+
+	if (!bHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attack Trace: No Hit"));
+		return;
+	}
+
+	TSet<AActor*> DamagedActors;
+
+	for (const FHitResult& HitResult : HitResults)
+	{
+		AActor* HitActor = HitResult.GetActor();
+
+		if (!HitActor || DamagedActors.Contains(HitActor))
+		{
+			continue;
+		}
+
+		UStatComponent* TargetStatComponent = HitActor->FindComponentByClass<UStatComponent>();
+		if (!TargetStatComponent)
+		{
+			continue;
+		}
+
+		DamagedActors.Add(HitActor);
+
+		TargetStatComponent->ApplyDamage(AttackDamage);
+
+		UE_LOG(LogTemp, Warning, TEXT("Attack hit: %s"), *HitActor->GetActorNameOrLabel());
+	}
 }
 
 void UCombatComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)

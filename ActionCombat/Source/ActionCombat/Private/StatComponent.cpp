@@ -19,7 +19,7 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 	if (bIsDead)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s is already dead. Damage ignored."),
-			*GetOwner()->GetName());
+			*GetOwner()->GetActorNameOrLabel());
 
 		return 0.0f;
 	}
@@ -36,7 +36,7 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 	const float ActualDamage = PreviousHealth - CurrentHealth;
 
 	UE_LOG(LogTemp, Warning, TEXT("%s took %.1f damage. HP: %.1f / %.1f"),
-		*GetOwner()->GetName(),
+		*GetOwner()->GetActorNameOrLabel(),
 		ActualDamage,
 		CurrentHealth,
 		MaxHealth);
@@ -46,7 +46,7 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 		bIsDead = true;
 
 		UE_LOG(LogTemp, Warning, TEXT("%s is dead."),
-			*GetOwner()->GetName());
+			*GetOwner()->GetActorNameOrLabel());
 	}
 
 	return ActualDamage;
@@ -62,7 +62,7 @@ void UStatComponent::BeginPlay()
 	bIsDead = false;
 
 	UE_LOG(LogTemp, Warning, TEXT("%s Stat Initialized. HP: %.1f / %.1f"),
-		*GetOwner()->GetName(),
+		*GetOwner()->GetActorNameOrLabel(),
 		CurrentHealth,
 		MaxHealth);
 

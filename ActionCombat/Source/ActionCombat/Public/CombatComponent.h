@@ -2,9 +2,6 @@
 
 #pragma once
 
-// Debugging purposes
-#include "TimerManager.h"
-
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
@@ -34,11 +31,20 @@ public:
 
 private:
 	bool bIsAttacking = false;
-		
-	FTimerHandle AttackTimerHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	float AttackDamage = 20.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	float AttackRange = 150.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	float AttackRadius = 60.0f;
+
+	void PerformAttackTrace();
 
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 };
