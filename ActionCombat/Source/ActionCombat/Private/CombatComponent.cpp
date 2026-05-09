@@ -50,6 +50,8 @@ void UCombatComponent::StartAttack()
 
 	bIsAttacking = true;
 
+	HitActorsThisAttack.Empty();
+
 	const float MontageDuration = AnimInstance->Montage_Play(AttackMontage);
 
 	if (MontageDuration <= 0.0f)
@@ -69,6 +71,7 @@ void UCombatComponent::StartAttack()
 void UCombatComponent::EndAttack()
 {
 	bIsAttacking = false;
+	HitActorsThisAttack.Empty();
 
 	UE_LOG(LogTemp, Warning, TEXT("EndAttack Called"));
 }
@@ -139,14 +142,20 @@ void UCombatComponent::PerformAttackTrace()
 		return;
 	}
 
-	TSet<AActor*> DamagedActors;
-
 	for (const FHitResult& HitResult : HitResults)
 	{
 		AActor* HitActor = HitResult.GetActor();
 
-		if (!HitActor || DamagedActors.Contains(HitActor))
+		if (!HitActor)
 		{
+			continue;
+		}
+
+		if (HitActorsThisAttack.Contains(HitActor))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Attack ignored: %s was already hit in this attack"),
+				*HitActor->GetActorNameOrLabel());
+
 			continue;
 		}
 
@@ -156,11 +165,12 @@ void UCombatComponent::PerformAttackTrace()
 			continue;
 		}
 
-		DamagedActors.Add(HitActor);
+		HitActorsThisAttack.Add(HitActor);
 
 		TargetStatComponent->ApplyDamage(AttackDamage);
 
-		UE_LOG(LogTemp, Warning, TEXT("Attack hit: %s"), *HitActor->GetActorNameOrLabel());
+		UE_LOG(LogTemp, Warning, TEXT("Attack hit: %s"),
+			*HitActor->GetActorNameOrLabel());
 	}
 }
 
