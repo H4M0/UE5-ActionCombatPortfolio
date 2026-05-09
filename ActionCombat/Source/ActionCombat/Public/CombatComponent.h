@@ -21,6 +21,8 @@ public:
 	void StartAttack();
 	void EndAttack();
 
+	void PerformAttackTrace();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -43,8 +45,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
 	float AttackRadius = 60.0f;
-
-	void PerformAttackTrace();
 
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 };

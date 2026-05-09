@@ -64,8 +64,6 @@ void UCombatComponent::StartAttack()
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, AttackMontage);
 
 	UE_LOG(LogTemp, Warning, TEXT("StartAttack Called"));
-
-	PerformAttackTrace();
 }
 
 void UCombatComponent::EndAttack()
