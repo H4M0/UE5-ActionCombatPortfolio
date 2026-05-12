@@ -41,6 +41,8 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 		CurrentHealth,
 		MaxHealth);
 
+	OnDamageTaken.Broadcast(ActualDamage, CurrentHealth, MaxHealth);
+
 	if (CurrentHealth <= 0.0f)
 	{
 		bIsDead = true;

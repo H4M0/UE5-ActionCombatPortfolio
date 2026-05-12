@@ -3,6 +3,7 @@
 
 #include "EnemyCharacter.h"
 #include "StatComponent.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -18,6 +19,10 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (StatComponent)
+	{
+		StatComponent->OnDamageTaken.AddDynamic(this, &AEnemyCharacter::HandleDamageTaken);
+	}
 }
 
 // Called every frame
@@ -32,5 +37,19 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AEnemyCharacter::HandleDamageTaken(float DamageAmount, float CurrentHealth, float MaxHealth)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s Hit Reaction. Damage: %.1f, HP:%.1f / %.1f"),
+		*GetActorNameOrLabel(),
+		DamageAmount,
+		CurrentHealth,
+		MaxHealth);
+
+	if (HitReactionMontage)
+	{
+		PlayAnimMontage(HitReactionMontage);
+	}
 }
 

@@ -7,6 +7,7 @@
 #include "EnemyCharacter.generated.h"
 
 class UStatComponent;
+class UAnimMontage;
 
 UCLASS()
 class ACTIONCOMBAT_API AEnemyCharacter : public ACharacter
@@ -32,4 +33,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStatComponent> StatComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowprivateAccess = "true"))
+	TObjectPtr<UAnimMontage> HitReactionMontage;
+
+	UFUNCTION()
+	void HandleDamageTaken(float DamageAmount, float CurrentHealth, float MaxHealth);
 };

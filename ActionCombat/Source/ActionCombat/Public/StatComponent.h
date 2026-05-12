@@ -6,6 +6,13 @@
 #include "Components/ActorComponent.h"
 #include "StatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
+	FOnDamageTakeSignature,
+	float, DamageAmount,
+	float, CurrentHealth,
+	float, MaxHealth
+);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONCOMBAT_API UStatComponent : public UActorComponent
@@ -21,6 +28,9 @@ public:
 	bool IsDead() const { return bIsDead; }
 	float GetCurrentHealth() const { return CurrentHealth; }
 	float GetMaxHealth() const { return MaxHealth; }
+
+	UPROPERTY(BlueprintAssignable, Category = "Stats")
+	FOnDamageTakeSignature OnDamageTaken;
 
 protected:
 	// Called when the game starts
