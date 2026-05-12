@@ -26,6 +26,9 @@ public:
 	void PerformAttackTrace();
 	void EndAttackTrace();
 
+	void StartDodge();
+	void EndDodge();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -37,9 +40,13 @@ public:
 private:
 	bool bIsAttacking = false;
 	bool bIsAttackTraceActive = false;
+	bool bIsDodging = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Attack", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Dodge", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> DodgeMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
 	float AttackDamage = 20.0f;
@@ -53,4 +60,5 @@ private:
 	TSet<AActor*> HitActorsThisAttack;
 
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnDodgeMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 };

@@ -72,6 +72,9 @@ void AActionCombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Attacking
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AActionCombatCharacter::Attack);
+
+		// Dodging
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &AActionCombatCharacter::Dodge);
 	}
 	else
 	{
@@ -144,5 +147,13 @@ void AActionCombatCharacter::Attack(const FInputActionValue& Value)
 	if (CombatComponent)
 	{
 		CombatComponent->StartAttack();
+	}
+}
+
+void AActionCombatCharacter::Dodge(const FInputActionValue& Value)
+{
+	if (CombatComponent)
+	{
+		CombatComponent->StartDodge();
 	}
 }

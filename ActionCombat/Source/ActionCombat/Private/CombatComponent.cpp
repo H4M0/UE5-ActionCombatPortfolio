@@ -28,6 +28,12 @@ void UCombatComponent::StartAttack()
 		return;
 	}
 
+	if (bIsDodging)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attack ignored: Currently dodging"));
+		return;
+	}
+
 	if (!AttackMontage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AttackMontage is not assigned"));
@@ -206,6 +212,65 @@ void UCombatComponent::EndAttackTrace()
 	UE_LOG(LogTemp, Warning, TEXT("Attack Trace Window End"));
 }
 
+void UCombatComponent::StartDodge()
+{
+	if (bIsDodging)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Dodge ignored: Already dodging"));
+		return;
+	}
+
+	if (bIsAttacking)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Dodge ignored: Currently attacking"));
+		return;
+	}
+
+	if (!DodgeMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DodgeMontage is not assigned"));
+		return;
+	}
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (!OwnerCharacter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner is not a Character"));
+		return;
+	}
+
+	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AnimInstance is invalid"));
+		return;
+	}
+
+	bIsDodging = true;
+
+	const float MontageDuration = AnimInstance->Montage_Play(DodgeMontage);
+
+	if (MontageDuration <= 0.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to play DodgeMontage"));
+		EndDodge();
+		return;
+	}
+
+	FOnMontageEnded MontageEndedDelegate;
+	MontageEndedDelegate.BindUObject(this, &UCombatComponent::OnDodgeMontageEnded);
+	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, DodgeMontage);
+
+	UE_LOG(LogTemp, Warning, TEXT("StartDodge Called"));
+}
+
+void UCombatComponent::EndDodge()
+{
+	bIsDodging = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("EndDodge Called"));
+}
+
 void UCombatComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (Montage != AttackMontage)
@@ -216,5 +281,18 @@ void UCombatComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterru
 	UE_LOG(LogTemp, Warning, TEXT("Attack Montage Ended. Interrupted: %s"), bInterrupted ? TEXT("true") : TEXT("false"));
 
 	EndAttack();
+}
+
+void UCombatComponent::OnDodgeMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage != DodgeMontage)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Dodge Montage Ended. Interrupted: %s"),
+		bInterrupted ? TEXT("true") : TEXT("false"));
+
+	EndDodge();
 }
 
