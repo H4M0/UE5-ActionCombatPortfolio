@@ -30,6 +30,9 @@ public:
 
 	float ApplyDamage(float DamageAmount);
 
+	void SetInvincible(bool bNewInvincible);
+	bool IsInvincible() const { return bIsInvincible; }
+
 	bool IsDead() const { return bIsDead; }
 	float GetCurrentHealth() const { return CurrentHealth; }
 	float GetMaxHealth() const { return MaxHealth; }
@@ -57,4 +60,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	bool bIsDead = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", meta = (AllowPrivateAccess = "true"))
+	bool bIsInvincible = false;
 };

@@ -282,6 +282,14 @@ void UCombatComponent::EndDodge()
 {
 	bIsDodging = false;
 
+	if (AActor* OwnerActor = GetOwner())
+	{
+		if (UStatComponent* StatComponent = OwnerActor->FindComponentByClass<UStatComponent>())
+		{
+			StatComponent->SetInvincible(false);
+		}
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("EndDodge Called"));
 }
 

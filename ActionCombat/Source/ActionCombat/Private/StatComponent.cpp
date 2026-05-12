@@ -24,6 +24,14 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 		return 0.0f;
 	}
 
+	if (bIsInvincible)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s is invincible. Damage ignored."),
+			*GetOwner()->GetActorNameOrLabel());
+
+		return 0.0f;
+	}
+
 	if (DamageAmount <= 0.0f)
 	{
 		return 0.0f;
@@ -54,6 +62,20 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 	}
 
 	return ActualDamage;
+}
+
+void UStatComponent::SetInvincible(bool bNewInvincible)
+{
+	if (bIsInvincible == bNewInvincible)
+	{
+		return;
+	}
+
+	bIsInvincible = bNewInvincible;
+
+	UE_LOG(LogTemp, Warning, TEXT("%s Invincible: %s"),
+		*GetOwner()->GetActorNameOrLabel(),
+		bIsInvincible ? TEXT("true") : TEXT("false"));
 }
 
 
