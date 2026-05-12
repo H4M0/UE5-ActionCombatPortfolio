@@ -248,6 +248,18 @@ void UCombatComponent::StartDodge()
 
 	bIsDodging = true;
 
+	FVector DodgeDirection = OwnerCharacter->GetVelocity();
+	DodgeDirection.Z = 0.0f;
+
+	if (!DodgeDirection.Normalize())
+	{
+		DodgeDirection = -OwnerCharacter->GetActorForwardVector();
+	}
+
+	const FVector LaunchVelocity = DodgeDirection * DodgeStrength + FVector(0.0f, 0.0f, DodgeUpStrength);
+
+	OwnerCharacter->LaunchCharacter(LaunchVelocity, true, true);
+
 	const float MontageDuration = AnimInstance->Montage_Play(DodgeMontage);
 
 	if (MontageDuration <= 0.0f)
@@ -262,6 +274,7 @@ void UCombatComponent::StartDodge()
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, DodgeMontage);
 
 	UE_LOG(LogTemp, Warning, TEXT("StartDodge Called"));
+	UE_LOG(LogTemp, Warning, TEXT("Dodge Direction: %s"), *DodgeDirection.ToString());
 }
 
 void UCombatComponent::EndDodge()

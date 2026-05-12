@@ -57,6 +57,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
 	float AttackRadius = 60.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Dodge", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	float DodgeStrength = 900.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Dodge", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	float DodgeUpStrength = 120.0f;
+
 	TSet<AActor*> HitActorsThisAttack;
 
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
