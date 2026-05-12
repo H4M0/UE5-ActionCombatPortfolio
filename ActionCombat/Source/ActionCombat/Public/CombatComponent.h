@@ -26,7 +26,7 @@ public:
 	void PerformAttackTrace();
 	void EndAttackTrace();
 
-	void StartDodge();
+	void StartDodge(const FVector& DodgeInputDirection);
 	void EndDodge();
 
 protected:
@@ -58,7 +58,7 @@ private:
 	float AttackRadius = 60.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Dodge", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
-	float DodgeStrength = 900.0f;
+	float DodgeStrength = 1500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Dodge", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
 	float DodgeUpStrength = 120.0f;

@@ -212,7 +212,7 @@ void UCombatComponent::EndAttackTrace()
 	UE_LOG(LogTemp, Warning, TEXT("Attack Trace Window End"));
 }
 
-void UCombatComponent::StartDodge()
+void UCombatComponent::StartDodge(const FVector& DodgeInputDirection)
 {
 	if (bIsDodging)
 	{
@@ -248,7 +248,7 @@ void UCombatComponent::StartDodge()
 
 	bIsDodging = true;
 
-	FVector DodgeDirection = OwnerCharacter->GetVelocity();
+	FVector DodgeDirection = DodgeInputDirection;
 	DodgeDirection.Z = 0.0f;
 
 	if (!DodgeDirection.Normalize())
@@ -274,7 +274,8 @@ void UCombatComponent::StartDodge()
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, DodgeMontage);
 
 	UE_LOG(LogTemp, Warning, TEXT("StartDodge Called"));
-	UE_LOG(LogTemp, Warning, TEXT("Dodge Direction: %s"), *DodgeDirection.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Dodge Input Direction: %s"), *DodgeInputDirection.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Dodge Dodge Direction: %s"), *DodgeDirection.ToString());
 }
 
 void UCombatComponent::EndDodge()

@@ -104,7 +104,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> DodgeAction;
 
+	FVector CurrentMovementInputDirection = FVector::ZeroVector;
+
 	void Attack(const FInputActionValue& Value);
 	void Dodge(const FInputActionValue& Value);
+	void ResetMovementInput(const FInputActionValue& Value);
 };
 

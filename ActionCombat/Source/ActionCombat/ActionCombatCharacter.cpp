@@ -65,6 +65,8 @@ void AActionCombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AActionCombatCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AActionCombatCharacter::ResetMovementInput);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Canceled, this, &AActionCombatCharacter::ResetMovementInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AActionCombatCharacter::Look);
 
 		// Looking
@@ -117,6 +119,13 @@ void AActionCombatCharacter::DoMove(float Right, float Forward)
 		// add movement 
 		AddMovementInput(ForwardDirection, Forward);
 		AddMovementInput(RightDirection, Right);
+
+		FVector InputDirection = FVector::ZeroVector;
+		InputDirection += ForwardDirection * Forward;
+		InputDirection += RightDirection * Right;
+		InputDirection.Z = 0.0f;
+
+		CurrentMovementInputDirection = InputDirection.GetSafeNormal();
 	}
 }
 
@@ -154,6 +163,11 @@ void AActionCombatCharacter::Dodge(const FInputActionValue& Value)
 {
 	if (CombatComponent)
 	{
-		CombatComponent->StartDodge();
+		CombatComponent->StartDodge(CurrentMovementInputDirection);
 	}
+}
+
+void AActionCombatCharacter::ResetMovementInput(const FInputActionValue& Value)
+{
+	CurrentMovementInputDirection = FVector::ZeroVector;
 }
