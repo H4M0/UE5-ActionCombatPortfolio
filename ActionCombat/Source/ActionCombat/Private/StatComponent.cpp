@@ -49,6 +49,8 @@ float UStatComponent::ApplyDamage(float DamageAmount)
 
 		UE_LOG(LogTemp, Warning, TEXT("%s is dead."),
 			*GetOwner()->GetActorNameOrLabel());
+
+		OnDeath.Broadcast(GetOwner());
 	}
 
 	return ActualDamage;

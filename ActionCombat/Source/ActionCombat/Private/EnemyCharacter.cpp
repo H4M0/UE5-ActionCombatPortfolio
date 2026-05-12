@@ -4,6 +4,8 @@
 #include "EnemyCharacter.h"
 #include "StatComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -22,6 +24,7 @@ void AEnemyCharacter::BeginPlay()
 	if (StatComponent)
 	{
 		StatComponent->OnDamageTaken.AddDynamic(this, &AEnemyCharacter::HandleDamageTaken);
+		StatComponent->OnDeath.AddDynamic(this, &AEnemyCharacter::HandleDeath);
 	}
 }
 
@@ -41,6 +44,11 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AEnemyCharacter::HandleDamageTaken(float DamageAmount, float CurrentHealth, float MaxHealth)
 {
+	if (CurrentHealth <= 0.0f)
+	{
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("%s Hit Reaction. Damage: %.1f, HP:%.1f / %.1f"),
 		*GetActorNameOrLabel(),
 		DamageAmount,
@@ -51,5 +59,17 @@ void AEnemyCharacter::HandleDamageTaken(float DamageAmount, float CurrentHealth,
 	{
 		PlayAnimMontage(HitReactionMontage);
 	}
+}
+
+void AEnemyCharacter::HandleDeath(AActor* DeadActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s HandleDeath Called"), *GetActorNameOrLabel());
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+
+	//SetLifeSpan(5.0f);
 }
 

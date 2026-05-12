@@ -13,6 +13,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	float, MaxHealth
 );
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnDeathSignature,
+	AActor*, DeadActor
+);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONCOMBAT_API UStatComponent : public UActorComponent
@@ -31,6 +36,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Stats")
 	FOnDamageTakeSignature OnDamageTaken;
+
+	UPROPERTY(BlueprintAssignable, Category = "Stats")
+	FOnDeathSignature OnDeath;
 
 protected:
 	// Called when the game starts

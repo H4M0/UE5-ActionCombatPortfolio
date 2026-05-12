@@ -38,4 +38,7 @@ private:
 
 	UFUNCTION()
 	void HandleDamageTaken(float DamageAmount, float CurrentHealth, float MaxHealth);
+
+	UFUNCTION()
+	void HandleDeath(AActor* DeadActor);
 };
