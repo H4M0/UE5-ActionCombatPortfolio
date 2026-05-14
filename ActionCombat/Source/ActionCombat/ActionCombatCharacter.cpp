@@ -12,7 +12,10 @@
 #include "InputActionValue.h"
 #include "ActionCombat.h"
 
+#include "Animation/AnimMontage.h"
+
 #include "CombatComponent.h"
+#include "StatComponent.h"
 
 AActionCombatCharacter::AActionCombatCharacter()
 {
@@ -54,6 +57,25 @@ AActionCombatCharacter::AActionCombatCharacter()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 }
 
+void AActionCombatCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	StatComponent = FindComponentByClass<UStatComponent>();
+
+	if (StatComponent)
+	{
+		StatComponent->OnDamageTaken.AddDynamic(this, &AActionCombatCharacter::HandleDamageTaken);
+		StatComponent->OnDeath.AddDynamic(this, &AActionCombatCharacter::HandleDeath);
+
+		UE_LOG(LogTemp, Warning, TEXT("Player StatComponent bound successfully"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player StatComponent not found"));
+	}
+}
+
 void AActionCombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -77,6 +99,11 @@ void AActionCombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Dodging
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &AActionCombatCharacter::Dodge);
+
+		if (DebugDamageAction)
+		{
+			EnhancedInputComponent->BindAction(DebugDamageAction, ETriggerEvent::Started, this, &AActionCombatCharacter::DebugApplyDamage);
+		}
 	}
 	else
 	{
@@ -170,4 +197,53 @@ void AActionCombatCharacter::Dodge(const FInputActionValue& Value)
 void AActionCombatCharacter::ResetMovementInput(const FInputActionValue& Value)
 {
 	CurrentMovementInputDirection = FVector::ZeroVector;
+}
+
+void AActionCombatCharacter::DebugApplyDamage(const FInputActionValue& Value)
+{
+	if (!StatComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DebugApplyDamage failed: StatComponent is null"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("DebugApplyDamage Called"));
+
+	StatComponent->ApplyDamage(DebugDamageAmount);
+}
+
+void AActionCombatCharacter::HandleDamageTaken(float DamageAmount, float CurrentHealth, float MaxHealth)
+{
+	if (CurrentHealth <= 0.0f)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Player Hit Reaction. Damage: %.1f, HP:%.1f / %.1f"),
+		DamageAmount,
+		CurrentHealth,
+		MaxHealth);
+
+	if (HitReactionMontage)
+	{
+		PlayAnimMontage(HitReactionMontage);
+	}
+}
+
+void AActionCombatCharacter::HandleDeath(AActor* DeadActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player HandleDeath Called"));
+
+	if (DeathMontage)
+	{
+		PlayAnimMontage(DeathMontage);
+	}
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PlayerController);
+	}
 }

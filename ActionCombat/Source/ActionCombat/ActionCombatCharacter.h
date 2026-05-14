@@ -11,6 +11,9 @@ class UCombatComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UStatComponent;
+class UAnimMontage;
+class AActor;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -56,6 +59,7 @@ public:
 	AActionCombatCharacter();	
 
 protected:
+	virtual void BeginPlay() override;
 
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -98,16 +102,40 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCombatComponent> CombatComponent;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStatComponent> StatComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> AttackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> DodgeAction;
 
+	// Debug
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Debug", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> DebugDamageAction;
+	// Debug
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug", meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	float DebugDamageAmount = 20.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Reaction", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> HitReactionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Reaction", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> DeathMontage;
+
 	FVector CurrentMovementInputDirection = FVector::ZeroVector;
 
 	void Attack(const FInputActionValue& Value);
 	void Dodge(const FInputActionValue& Value);
 	void ResetMovementInput(const FInputActionValue& Value);
+
+	void DebugApplyDamage(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void HandleDamageTaken(float DamageAmount, float CurrentHealth, float MaxHealth);
+
+	UFUNCTION()
+	void HandleDeath(AActor* DeadActor);
 };
 
